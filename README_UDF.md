@@ -123,22 +123,22 @@ Backend 서버의 IP 주소를 반환하도록 NGINX 로드밸런서를 설정�
 
 API Gateway 클러스터 활성화
 
-- In API Connectivity Manager, Infrastructure, create a Workspace, an Environment. In the Environment tab, add API Gateway Cluster. You may fill in any mock~~ details, but the Name of the API Gateway Clusters must be same with the instance group name you specify for the nginx-gw in docker-compose file, in this case "gwcluster"
+- API Connectivity Manager에서 Infrastructure에서 Workspace와 Environment를 생성하고 Environment 메뉴에서 API Gateway Cluster를 추가 합니다. API Gateway Cluster의 이름은 받드시 Instance Group의 이름과 동일하게 설정을 해야 정상적으로 연결 설정이 됩니다. 이 예제에서는 "gwcluster"라는 이름으로 생성을 하였습니다. 
 
 ![alt text](assets/infra-workspace.png)
 ![alt text](assets/infra-env.png)
 
-- Once done, click into the API Gateway section, you will see there are 2 nginx-gw in the Instances section.
+- 위 설정이 완료되었다면, API Gateway 메뉴에서 Instance 부분에 2개의 nginx-gw 인스턴스가 연결된 것을 확인할 수 있습니다.
 ![alt text](assets/infra-creation-complete.png)
 
-Optional:
-By scaling the nginx-gw instances, the newly spin up instance will auto register as part of the API Gateway Cluster instance group. You will notice additional instance in the Instances section.
+선택사항:
+nginx-gw 게이트웨이를 추가로 생성하여 spin-up을 할 경우 추가되는 nginx-gw 인스턴스는 자동으로 Instance Group으로 연결되고 해당 그룹에 자동으로 설정이 추가 됩니다. 이 부분은 nginx-gw replicas를 변경해서 확인할 수 있습니다. (아래 예시 참조)
 ```
-# Edit docker-compose file, under nginx-gw section, change the replicas to 3
+# docker-compose 파일의 nginx-gw 부분에서 replicas를 3으로 변경 후 docker-compose 재실행 
 sudo docker compose -f docker-compose.yaml up -d
 ```
 
-- Under API Connectivity Manager, Services, create a Workspace, Publish API Proxy
+- API Connectivity Manager의 "Services" 메뉴에서 서비스에 해당하는 Workspace를 생성하여 해당 Workspace에 API Proxy를 배포 합니다.
 ```    
 Name: <anything>
 Service Target Hostname: httpbin-app
