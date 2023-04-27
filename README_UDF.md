@@ -1,127 +1,129 @@
-Note: As of this writing, only NIM is supported in ARM processor but not the other modules (ADM, ACM, SM)
+알림: 현재 시점 기준으로 ARM 프로세스를 지원하는 것은 NIM 모듈 뿐이며, 다른 모듈(ADM, ACM, SM)은 ARM 프로세스를 지원하지 않습니다.
 
-## This version of README is for F5 UDF lab (NGINX Workshop Sandpit blueprint), as the commands used are slighlty different.
+## 이 문서는 UDF랩 환경을 기준으로 하기 때문에 명령 부분이 조금 다를 수 있습니다.
 
-## Credit
-This repo leveraged the work done by fantastic [Fabrizio](https://github.com/fabriziofiorucci) at https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-nms-docker
+## 원본
+이 repository는 훌륭한 [Fabrizio](https://github.com/fabriziofiorucci) at https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-nms-docker를 복제하여 작성된 내용 입니다.
 
-## Description
-This demo kit can be used to easily step up NGINX Management Suites-NMS with various modules (API Connectivity Manager-ACM, Instance Manager-NIM, Security Monitoring-SM), NGINX Plus as load balancer and API Gateway, NGINX App Protect as API Security Protection.
+## 요약
 
-For demonstration, we will build a demo setup of 1 LB fronting API gateway clusters which connect to the API endpoints
+이 데모 킷은 NGINX 관리 모듈을 쉽게 사용하고 활용할 수 있으며, 관리 모듈의 다양한 기능(API Connectivity Manager - ACM, NGINX Instance Manager - NIM, Security Monitoring - SM)과 NGINX Plus의 로드밸런서 및 API 게이트웨이 그리고 K8s Ingress Controller를 모두 함께 사용할 수 있습니다.
+
+이 데모에서는 하나의 LB를 프론트엔드에 배치하고 이를 통해 내부의 K8s 클러스터에 구성된 API 게이트웨이로 트래픽을 전달하여 최종적으로 API 엔드포인트를 엑세스할 수 있습니다.
 
 ![alt text](assets/demo-setup-part-1.png)
 
-## Prerequisite: 
-- Install docker and docker-compose in your machine
-- In [NGINX website](https://www.nginx.com/pricing/) request for NGINX Plus and NGINX Management Suite trial licenses
+## 사전 준비사항: 
+- docker-compose를 desktop에 설치
+- [NGINX 공식웹사이트](https://www.nginx.com/pricing/)에서 NGINX Plus 및 NGINX Management Suite에 대한 Trial 라이센스를 요청하여 준비
 
 
-## Getting started
-0. **Access Lab Environment
-After starting NGINX Workshop Sandpit blueprint, access vscode app via Ubuntu->vscode
+## 시작하기
+0. **UDF 랩 환경 접속하기
+UDF 랩 시작 후 Ubuntu 머신의 엑세스 > VSCODE를 통해 vscode 앱에 엑세스 합니다.
 ![alt text](assets/access_vscode.png)
 
-Access the terminal in VSCode
+VSCODE 앱을 실행 후 터미널을 실행
 ![alt text](assets/launch_terminal_in_vscode.png)
 
 
 
-1. **Start NMS**
+1. **NMS 시작**
 ```
-#Clone the repo
-git clone https://github.com/mcheo/nms-demo-kit
+# 아래 주소를 이용해서 github 리파지토리를 복제
+git clone https://github.com/f5minions/nms-demo-kit
 
 cd nms-demo-kit
 
-#Make the script executable
+# 스크립트 파일에 실행 권한을 부여
 chmod 755 ./scripts/*
 
-#Download NGINX Plus trial license and put nginx-repo.crt and nginx-repo.key in nginx-plus folder
+# NGINX Plus trial 라이센스를 다운받은 후 nginx-repo.crt와 nginx-repo.key 파일을 nginx-plus 폴더에 복사
 cp nginx-repo.* nginx-plus/
 
-#Build NMS (NGINX Instance Manager, API Connectivity Manager) container image
-#Example build with the latest release
+# NMS (NGINX Instance Manager, API Connectivity Manager) 컨테이너 이미지를 빌드
+# 최신 릴리스 버전을 기준으로 컨테이터 이미지 빌드 예시
 sudo ./scripts/buildNMS.sh -t nginx-nms -i -C nginx-plus/nginx-repo.crt -K nginx-plus/nginx-repo.key -A -W
 
-#Or build with specific version
-#You may edit Dockerfile to specify the .deb package version for the required modules
-#sudo ./scripts/buildNMS.sh -t nginx-nms:2.6 -C nginx-plus/nginx-repo.crt -K nginx-plus/nginx-repo.key -A -W
+# 또는 원하는 버전을 명시하여 컨테이너 이미지를 빌드
+# Dockerfile을 수정을 통해 원하는 이미지 버전 패키지를 명시하면 됩니다
+# sudo ./scripts/buildNMS.sh -t nginx-nms:2.6 -C nginx-plus/nginx-repo.crt -K nginx-plus/nginx-repo.key -A -W
 
-#To deploy NMS container
-#Running in MacOS might encounter port 5000 being used by AirPlay sharing process. 
-#You may change the port to other than 5000 in docker-compose.yaml eg: - "6000:5000"
+# NMS 컨테이너 배포
+# 만약 MacOS 환경에서 진행을 한다면 5000번 포트는 AirPlay Sharing 모듈에 의해 이미 예약되어 있어 사용이 불가능하기 때문에 다른 포트를 명시에서 사용해야 합니다. 
+# 포트의 변경은 docker-compose.yaml 파일에서 예시와 같이 변경을 할 수 있습니다. 예) "6000:5000"
 
 sudo docker compose -f docker-compose.yaml up -d
 ```
 
-2. **Access NMS GUI**
+2. **배포 후 NMS GUI 접속**
 
-After few momemnt, click on Ubuntu -> HTTP-443 to access the NMS. login with admin/admin credentials or whatever you specify in the docker-compose.yaml
+NMS 배포 후 (배포 및 구동에 약간의 시간이 소요됨) UDF의 Ubuntu 머신의 HTTP-443 엑세스를 클릭하면 GUI 화면에서 admin/admin 계정 정보로 로그인을 할 수 있습니다. 초기 docker-compose.yaml 파일에서 admin:admin으로 비밀번호를 설정하지 않고 임의의 비밀번호를 사용하였다면 해당 계정 및 비밀번호를 통해서 로그인을 할 수 있습니다. 
 
 ![alt text](assets/access_nms_vis_http_443.png)
 ![alt text](assets/nms_prelogin_landing_page.png)
 ![alt text](assets/nms_login_prompt.png)
 
 
-Click on Settings and upload the NMS trial license.
+NMS 화면 로그인 후 Settings(설정) 메뉴를 클릭하여 라이센스를 업로드하여 NMS를 활성화 합니다.
 ![alt text](assets/nms-license.png)
 
-Click on the browser Refresh button for the page to display availalble modules.
+업로드 후 브라우저의 새로고침 버튼을 통해 새로고침을 하면 정상적으로 NMS 메뉴가 보입니다.
 
-3. **Start NGINX Plus**
+3. **NGINX Plus 시작하기**
 ```
-#Build NGINX Plus image with nginx-agent
-#Specify NMS IP address (your laptop IP address), DO NOT use localhost or 127.0.0.1
+# nginx-agent가 포함된 NGINX Plus 이미지 빌드
+# NMS의 IP 주소를 입력 합니다. localhost 또는 127.0.0.1 주소를 사용하지 않고 시스템(또는 Labtop)의 IP 주소를 입력 합니다. 
 sudo ./scripts/buildNPlusWithAgent.sh -t npluswithagent -n https://10.1.1.6
 
-#Build NGINX Plus (ACM Dev-Portal) image with nginx-agent
-#Specify NMS IP address (your laptop IP address), DO NOT use localhost or 127.0.0.1
+# nginx-agent가 포함된 NGINX Plus(ACM Dev Portal용) 이미지를 빌드
+# NMS의 IP 주소를 입력 합니다. localhost 또는 127.0.0.1 주소를 사용하지 않고 시스템(또는 Labtop)의 IP 주소를 입력 합니다. 
 sudo ./scripts/buildNPlusWithAgent.sh -t npluswithagent:devportal -D -n https://10.1.1.6
 
-#Uncomment nginx-lb, nginx-gw, httpbin-app, acm.nginx-devportal section in docker-compose.yaml section
+# docker-compose.yaml에서 nginx-lb, nginx-gw, httpbin-app, acm.nginx-devportal에 Uncomment nginx-lb, nginx-gw, httpbin-app, acm.nginx-devportal에 설정된 주석을 제거하고 docker-compose를 다시 실행하면 업데이트된 내용이 반영 됩니다.
 sudo docker compose -f docker-compose.yaml up -d
 ```
-You should have these number of containers running
+아래의 화면과 같은 수의 컨테이너가 실행 중이어야 정상 입니다
 ![alt text](assets/running-containers-new.png)
 
-For the first time, click browser refresh. On NMS Instance Manager dashboard, you should see these instances
+NMS Instance Manager 대시보드에서 새로고침을 했을 때 아래의 화면과 같이 인스턴스가 정상적으로 표시가 되어야 합니다
 ![alt text](assets/nim-managed-instances.png)
 
 
-4. **Configure Load Balancer using NIM**
+4. **NIM을 통해 Loadbalancer의 구성하기**
 
-Enable NGINX API for NGINX LB
+NGINX LB에 대한 NGINX API 사용 활성화
 
-- In Instance Manager section, Instances tab, click on nginx-lb and Edit Config, add a new file as /etc/nginx/conf.d/nplusapi.conf  You may copy the content from repo misc/nplusapi.conf
+- Instance Manager의 Instances 매뉴에서 nginx-lb 인스턴스를 클릭하고, edit config 메뉴를 클릭하여 새파일 /etc/nginx/conf.d/nplusapi.conf 파일을 추가 합니다. repo misc/nplusapi.conf파일에서 해당 내용을 복사할 수 있습니다. 
 ![alt text](assets/edit-nginx-plus-api-conf.png)
 
-- Replace the existing default.conf config with misc/lb.conf config
+- 기존 default.conf 설정을 repo의 misc/lb.conf 파일 설정으로 변경 합니다.
 ![alt text](assets/edit-nginx-plus-default-conf.png)
 
-- Click Publish
+- 설정이 모두 완료되면 publish를 클릭하여 nginx-lb 인스턴스에 업데이트를 합니다.
 
-Test the LB setting
+LB 설정 테스트
 ```
 curl -I http://localhost/
 curl -I http://localhost/
 ```
-We have configured NGINX load balancer to return backend server's IP address. There are multiple backend server (NGINX Gateway), the NGINX load balancer will round robin to different backend server and return respective IP addresses. Your containers IP addresses might be different from what is shown below.
+
+Backend 서버의 IP 주소를 반환하도록 NGINX 로드밸런서를 설정했기 때문에, 여러 Backend 서버(여기서는 Backend에 구성한 NGINX 게이트웨이)가 있으며, NGINX 로드밸런서는 각각의 서버로 라운드로빈으로 분산하고 각각의 IP주소를 반환 합니다. Backend 컨테이너 서버의 IP 주소는 아래와 표시된 것과 다를 수 있습니다.
 
 ![alt text](assets/lb-curl-testing.png)
 
 
-5. **Configure API Gateway using ACM**
+1. **ACM을 통해 NGINX API Gateway 설정**
 
-Tips: For step 5, you may choose to use the script to automate ACM configuration. However, you are encouraged to manually execute the steps below to be familiar with the ACM workflow.
+팁!: 5번째 단계에서 스크립트를 사용하여 ACM 구성을 자동화하도록 선택할 수 있습니다. 하지만 ACM 워크플로에 익숙해지기 위해 아래 단계를 수동으로 실행하는 것을 권장 합니다. 
 ```
 #sh misc/end2end_deploy.sh
 #sh misc/end2end_delete.sh
 ```
 
-Enable API Gateway Cluster
+API Gateway 클러스터 활성화
 
-- In API Connectivity Manager, Infrastructure, create a Workspace, an Environment. In the Environment tab, add API Gateway Cluster. You may fill in any mock details, but the Name of the API Gateway Clusters must be same with the instance group name you specify for the nginx-gw in docker-compose file, in this case "gwcluster"
+- In API Connectivity Manager, Infrastructure, create a Workspace, an Environment. In the Environment tab, add API Gateway Cluster. You may fill in any mock~~ details, but the Name of the API Gateway Clusters must be same with the instance group name you specify for the nginx-gw in docker-compose file, in this case "gwcluster"
 
 ![alt text](assets/infra-workspace.png)
 ![alt text](assets/infra-env.png)

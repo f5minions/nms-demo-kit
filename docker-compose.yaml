@@ -15,7 +15,7 @@ services:
        hostname: nginx-nms
        ports:
         - "443:443"
-        - "5000:5000"
+        - "6000:5000"
        environment:
         ### NGINX Instance Manager environment
         - NIM_USERNAME=admin
@@ -29,30 +29,30 @@ services:
         - NIM_CLICKHOUSE_PASSWORD=NGINXr0cks
        depends_on:
          - clickhouse
-    # httpbin-app:
-    #     image: kennethreitz/httpbin
-    #     environment:
-    #         - "GUNICORN_CMD_ARGS=\"--capture-output --error-logfile - --access-logfile - --access-logformat \"%(h)s %(t)s %(r)s %(s)s Host: %({Host}i)s}\"\""
-    #     expose:
-    #      - "80"
-    # nginx-lb:
-    #     image: npluswithagent:latest
-    #     hostname: nginx-lb
-    #     ports:
-    #     - "80:80"
-    #     - "8080:8080"
-    #     environment:
-    #      - NIM_HOST=nginx-nms
-    #      - NIM_GRPC_PORT=443
-    # nginx-gw:
-    #     image: npluswithagent:latest
-    #     hostname: nginx-gw
-    #     deploy:
-    #         replicas: 2
-    #     environment:
-    #      - NIM_HOST=nginx-nms
-    #      - NIM_GRPC_PORT=443
-    #      - NIM_INSTANCEGROUP=gwcluster
+    httpbin-app:
+        image: kennethreitz/httpbin
+        environment:
+            - "GUNICORN_CMD_ARGS=\"--capture-output --error-logfile - --access-logfile - --access-logformat \"%(h)s %(t)s %(r)s %(s)s Host: %({Host}i)s}\"\""
+        expose:
+         - "80"
+    nginx-lb:
+        image: npluswithagent:latest
+        hostname: nginx-lb
+        ports:
+        - "80:80"
+        - "8080:8080"
+        environment:
+         - NIM_HOST=nginx-nms
+         - NIM_GRPC_PORT=443
+    nginx-gw:
+        image: npluswithagent:latest
+        hostname: nginx-gw
+        deploy:
+            replicas: 2
+        environment:
+         - NIM_HOST=nginx-nms
+         - NIM_GRPC_PORT=443
+         - NIM_INSTANCEGROUP=gwcluster
     # acm.nginx-devportal:
     #     image: npluswithagent:devportal
     #     hostname: nginx-devportal

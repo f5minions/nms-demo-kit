@@ -28,6 +28,6 @@ fi
 
 echo "Creating image     : $IMAGENAME"
 
-DOCKER_BUILDKIT=1 docker build --no-cache -f ./nginx-plus/Dockerfile_nap --build-arg NMS_URL=$NMSURL -t $IMAGENAME .
+DOCKER_BUILDKIT=0 docker build --no-cache -f ./nginx-plus/Dockerfile_nap --build-arg NMS_URL=$NMSURL -t $IMAGENAME .
 
 echo "Build complete, docker image is $IMAGENAME"
