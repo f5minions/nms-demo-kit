@@ -49,7 +49,7 @@ sudo ./scripts/buildNMS.sh -t nginx-nms -i -C nginx-plus/nginx-repo.crt -K nginx
 # Dockerfile을 수정을 통해 원하는 이미지 버전 패키지를 명시하면 됩니다
 # sudo ./scripts/buildNMS.sh -t nginx-nms:2.6 -C nginx-plus/nginx-repo.crt -K nginx-plus/nginx-repo.key -A -W
 
-# NMS 컨테이너 배포
+# NMS 컨테이너 배포하기
 # 만약 MacOS 환경에서 진행을 한다면 5000번 포트는 AirPlay Sharing 모듈에 의해 이미 예약되어 있어 사용이 불가능하기 때문에 다른 포트를 명시에서 사용해야 합니다. 
 # 포트의 변경은 docker-compose.yaml 파일에서 예시와 같이 변경을 할 수 있습니다. 예) "6000:5000"
 
